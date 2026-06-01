@@ -1,0 +1,16 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: argocd-app
+spec:
+  destination:
+    namespace: devops-lab
+    server: https://kubernetes.default.svc
+  source:
+    repoURL: https://github.com/tekne-ops/gitops-platform
+    path: workloads/devops-lab/overlays/dev
+  project: dev
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true

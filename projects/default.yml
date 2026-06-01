@@ -1,0 +1,24 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: dev
+  namespace: devops-lab
+spec:
+  description: Dev environment project
+
+  sourceRepos:
+    - https://github.com/tekne-ops/gitops-platform
+
+  destinations:
+    - server: https://kubernetes.default.svc
+      namespace: devops-lab
+
+  namespaceResourceWhitelist:
+    - group: apps
+      kind: Deployment
+    - group: ''
+      kind: Service
+
+  clusterResourceWhitelist:
+    - group: ''
+      kind: Namespace

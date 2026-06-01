@@ -49,15 +49,33 @@ gitops-platform/
 
 ### apps/
 Argo CD Application definitions (one per app per environment).
+It does NOT contain resources itself, but points to them.
 
 ### projects/
 Argo CD AppProjects for RBAC and governance.
+  Which repos are allowed
+  Which clusters/namespaces apps can deploy to
+  Security boundaries (RBAC)
+  Optional policies (sync, quotas, etc.)
 
 ### infrastructure/
 Cluster-level resources like namespaces, ingress, and monitoring.
 
 ### workloads/
 Application manifests using Kustomize (base + overlays).
+Base should contain:
+  Deployment
+  Service
+  ConfigMaps (generic)
+  Labels
+  Probes
+  Default configuration
+Base should contain:
+  replicas (dev=1, prod=5)
+  image tag (dev=latest, prod=stable)
+  resources (dev=low, prod=high)
+  env vars (debug=true in dev)
+  ingress (maybe only in prod)
 
 ### bootstrap/
 Root Argo CD app (App of Apps pattern).
