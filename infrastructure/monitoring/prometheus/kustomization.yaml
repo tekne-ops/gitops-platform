@@ -7,4 +7,4 @@ helmCharts:
     valuesInline:
       server:
         persistentVolume:
-          size: 10Gi
+          enabled: false

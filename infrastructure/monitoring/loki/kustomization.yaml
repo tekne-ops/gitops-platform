@@ -10,8 +10,16 @@ helmCharts:
     valuesInline:
       loki:
         persistence:
-          enabled: true
-          size: 10Gi
+          enabled: false
+      write:
+        persistence:
+          volumeClaimsEnabled: false
+      read:
+        persistence:
+          volumeClaimsEnabled: false
+      backend:
+        persistence:
+          volumeClaimsEnabled: false
       monitoring:
         selfMonitoring:
           enabled: false
