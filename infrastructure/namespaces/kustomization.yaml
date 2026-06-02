@@ -1,0 +1,8 @@
+commonAnnotations:
+  argocd.argoproj.io/sync-wave: "-1"
+
+resources:
+  - ingress-nginx.yaml
+  - cert-manager.yaml
+  - monitoring.yaml
+  - devops-lab.yaml
