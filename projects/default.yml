@@ -4,26 +4,19 @@ metadata:
   name: dev
   namespace: argocd
 spec:
-  description: Dev environment project
+  description: development
 
   sourceRepos:
-    - https://github.com/tekne-ops/gitops-platform
-    - https://github.com/tekne-ops/gitops-platform.git
+    - '*'
 
   destinations:
-    - server: https://kubernetes.default.svc
-      namespace: devops-lab
-    - server: https://kubernetes.default.svc
-      namespace: cert-manager
-    - server: https://kubernetes.default.svc
-      namespace: monitoring
+    - namespace: '*'
+      server: https://kubernetes.default.svc
 
   namespaceResourceWhitelist:
-    - group: apps
-      kind: Deployment
     - group: '*'
       kind: '*'
 
   clusterResourceWhitelist:
-    - group: ''
-      kind: Namespace
+    - group: '*'
+      kind: '*'
