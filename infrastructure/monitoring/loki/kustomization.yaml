@@ -9,3 +9,5 @@ helmCharts:
         persistence:
           enabled: true
           size: 10Gi
+
+      installCRDs: true
