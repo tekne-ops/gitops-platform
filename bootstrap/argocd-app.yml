@@ -8,7 +8,7 @@ spec:
     server: https://kubernetes.default.svc
   source:
     repoURL: https://github.com/tekne-ops/gitops-platform
-    path: workloads/devops-lab/overlays/dev
+    path: apps/dev
   project: dev
   syncPolicy:
     automated:
