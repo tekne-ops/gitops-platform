@@ -10,5 +10,8 @@ helmCharts:
       server:
         persistentVolume:
           enabled: false
+      alertmanager:
+        persistence:
+          enabled: false
       prometheus-node-exporter:
         enabled: false
