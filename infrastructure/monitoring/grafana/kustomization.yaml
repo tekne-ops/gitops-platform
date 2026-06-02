@@ -10,5 +10,3 @@ helmCharts:
       service:
         type: NodePort
         nodePort: 32000
-
-      installCRDs: true

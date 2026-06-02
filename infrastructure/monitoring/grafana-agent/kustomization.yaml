@@ -12,7 +12,7 @@ helmCharts:
         mode: "flow"
 
       logs:
-        enabled: true
+        enabled: false
 
       metrics:
         enabled: true
