@@ -1,0 +1,11 @@
+helmGlobals:
+  chartHome: /tmp/helmcharts
+
+helmCharts:
+  - name: grafana-agent-operator
+    repo: https://grafana.github.io/helm-charts
+    version: 0.37.0
+    releaseName: grafana-agent-operator
+    namespace: monitoring
+    valuesInline:
+      installCRDs: true

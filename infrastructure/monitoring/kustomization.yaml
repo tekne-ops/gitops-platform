@@ -1,4 +1,5 @@
 resources:
-  - prometheus/
-  - grafana/
+  - grafana-agent/
   - loki/
+  - grafana/
+  - prometheus/
