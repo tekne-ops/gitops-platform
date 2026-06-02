@@ -168,7 +168,7 @@ argocd repo add https://grafana.github.io/helm-charts --type helm
 kubectl edit configmap argocd-cm -n argocd
 Add:
 data:
-  kustomize.buildOptions: --enable-helm --load-restrictor LoadRestrictionsNone --reorder none
+  kustomize.buildOptions: --enable-helm --load-restrictor LoadRestrictionsNone
 ```
 
 ```bash

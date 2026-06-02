@@ -1,3 +1,7 @@
+
+helmGlobals:
+  chartHome: /tmp/helmcharts
+
 resources:
   - cluster-issuer.yaml
 
