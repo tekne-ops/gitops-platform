@@ -1,3 +1,4 @@
+namespace: cert-manager
 
 helmGlobals:
   chartHome: /tmp/helmcharts
