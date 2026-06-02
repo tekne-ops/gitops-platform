@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: devops-lab
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: devops-lab
+  template:
+    metadata:
+      labels:
+        app: devops-lab
+    spec:
+      imagePullSecrets:
+        - name: regcred
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        fsGroup: 1000
+      containers:
+      - name: app
+        image: ghcr.io/tekne-ops/devops-lab:latest
+        ports:
+        - containerPort: 5000
+        securityContext:
+          runAsNonRoot: true
+          runAsUser: 1000
+          readOnlyRootFilesystem: true
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+              - ALL

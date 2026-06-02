@@ -1,0 +1,11 @@
+helmCharts:
+  - name: loki
+    repo: https://grafana.github.io/helm-charts
+    version: 5.43.0
+    releaseName: loki
+    namespace: monitoring
+    valuesInline:
+      loki:
+        persistence:
+          enabled: true
+          size: 10Gi

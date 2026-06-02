@@ -2,15 +2,22 @@ apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
   name: infrastructure
+  namespace: argocd
 spec:
-  destination:
-    namespace: argocd
-    server: https://kubernetes.default.svc
-  source:
-    repoURL: https://github.com/tekne-opsadvise/gitops-platform
-    path: infrastructure
   project: dev
+
+  source:
+    repoURL: https://github.com/tekne-ops/gitops-platform
+    targetRevision: main
+    path: infrastructure
+
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: argocd
+
   syncPolicy:
     automated:
       prune: true
       selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
