@@ -4,7 +4,7 @@ helmGlobals:
 helmCharts:
   - name: grafana-agent-operator
     repo: https://grafana.github.io/helm-charts
-    version: 0.34.0
+    version: ""
     releaseName: grafana-agent-operator
     namespace: monitoring
     valuesInline:
