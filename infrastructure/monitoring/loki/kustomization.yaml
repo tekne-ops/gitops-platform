@@ -10,16 +10,20 @@ helmCharts:
     releaseName: loki
     namespace: monitoring
     valuesInline:
-      loki:
+      singleBinary:
+        replicas: 1
         persistence:
           enabled: false
       write:
+        replicas: 0
         persistence:
           volumeClaimsEnabled: false
       read:
+        replicas: 0
         persistence:
           volumeClaimsEnabled: false
       backend:
+        replicas: 0
         persistence:
           volumeClaimsEnabled: false
       monitoring:
@@ -27,5 +31,7 @@ helmCharts:
           enabled: false
           grafanaAgent:
             installOperator: false
+        lokiCanary:
+          enabled: false
       test:
         enabled: false
