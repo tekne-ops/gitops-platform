@@ -1,0 +1,38 @@
+# Log storage backend for k8s-monitoring (single-binary, no PVC — use storage in prod)
+loki:
+  storage:
+    type: filesystem
+  commonConfig:
+    replication_factor: 1
+
+singleBinary:
+  replicas: 1
+  persistence:
+    enabled: false
+  extraVolumes:
+    - name: storage
+      emptyDir: {}
+  extraVolumeMounts:
+    - name: storage
+      mountPath: /var/loki
+
+write:
+  replicas: 0
+read:
+  replicas: 0
+backend:
+  replicas: 0
+
+gateway:
+  enabled: false
+
+monitoring:
+  selfMonitoring:
+    enabled: false
+    grafanaAgent:
+      installOperator: false
+  lokiCanary:
+    enabled: false
+
+test:
+  enabled: false

@@ -1,0 +1,35 @@
+name: Render Helm charts
+
+on:
+  pull_request:
+    paths:
+      - 'helm-values/**'
+      - 'scripts/render-charts.sh'
+  push:
+    branches: [main]
+    paths:
+      - 'helm-values/**'
+      - 'scripts/render-charts.sh'
+
+jobs:
+  render:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Helm
+        uses: azure/setup-helm@v4
+
+      - name: Render charts
+        run: ./scripts/render-charts.sh
+
+      - name: Check for uncommitted manifest changes
+        run: |
+          git diff --exit-code infrastructure/*/base/ || \
+            (echo "::error::Run ./scripts/render-charts.sh and commit rendered manifests" && exit 1)
+
+      - name: Install Kustomize
+        uses: imranismail/setup-kustomize@v2
+
+      - name: Validate kustomize overlays
+        run: make validate

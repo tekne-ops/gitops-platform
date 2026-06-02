@@ -1,0 +1,31 @@
+# Metrics, Grafana, Alertmanager, node-exporter (single observability metrics stack)
+grafana:
+  adminPassword: changeme
+  service:
+    type: NodePort
+    nodePort: 32000
+
+prometheus:
+  prometheusSpec:
+    retention: 15d
+    # Enable persistence in prod: add storageSpec with storageClassName
+    resources:
+      requests:
+        cpu: 200m
+        memory: 512Mi
+
+alertmanager:
+  alertmanagerSpec:
+    resources:
+      requests:
+        cpu: 50m
+        memory: 128Mi
+
+nodeExporter:
+  enabled: true
+
+kubeStateMetrics:
+  enabled: true
+
+crds:
+  enabled: false

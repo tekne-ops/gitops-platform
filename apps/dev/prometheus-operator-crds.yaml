@@ -1,20 +1,23 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: platform-dev
+  name: prometheus-operator-crds
   namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "0"
 spec:
-  project: default
+  project: infra
   source:
     repoURL: https://github.com/tekne-ops/gitops-platform
     targetRevision: main
-    path: apps/dev
+    path: infrastructure/prometheus-operator-crds/overlays/dev
   destination:
     server: https://kubernetes.default.svc
-    namespace: argocd
+    namespace: monitoring
   syncPolicy:
     automated:
       prune: true
       selfHeal: true
     syncOptions:
       - ServerSideApply=true
+      - Replace=true

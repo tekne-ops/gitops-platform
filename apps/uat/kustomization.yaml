@@ -1,0 +1,6 @@
+# UAT app-of-apps (stub) — mirror apps/dev/ with prod-like values.
+
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources: []

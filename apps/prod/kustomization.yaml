@@ -1,0 +1,11 @@
+# Production app-of-apps (stub)
+#
+# Mirror apps/dev/ with:
+#   - targetRevision or path overlays/prod
+#   - stricter sync policies
+#   - helm-values/prod/
+
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources: []

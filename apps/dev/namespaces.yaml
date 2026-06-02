@@ -1,17 +1,19 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: platform-dev
+  name: namespaces
   namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "-1"
 spec:
-  project: default
+  project: infra
   source:
     repoURL: https://github.com/tekne-ops/gitops-platform
     targetRevision: main
-    path: apps/dev
+    path: infrastructure/namespaces
   destination:
     server: https://kubernetes.default.svc
-    namespace: argocd
+    namespace: kube-system
   syncPolicy:
     automated:
       prune: true

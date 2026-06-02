@@ -1,20 +1,29 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: platform-dev
+  name: devops-lab
   namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "10"
 spec:
-  project: default
+  project: apps
   source:
     repoURL: https://github.com/tekne-ops/gitops-platform
     targetRevision: main
-    path: apps/dev
+    path: workloads/devops-lab/overlays/dev
   destination:
     server: https://kubernetes.default.svc
-    namespace: argocd
+    namespace: devops-lab
   syncPolicy:
     automated:
       prune: true
       selfHeal: true
+    retry:
+      limit: 5
+      backoff:
+        duration: 10s
+        factor: 2
+        maxDuration: 5m
     syncOptions:
+      - CreateNamespace=true
       - ServerSideApply=true

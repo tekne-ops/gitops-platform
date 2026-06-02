@@ -1,0 +1,20 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: apps
+  namespace: argocd
+spec:
+  description: Application workloads
+
+  sourceRepos:
+    - https://github.com/tekne-ops/gitops-platform
+
+  destinations:
+    - namespace: devops-lab
+      server: https://kubernetes.default.svc
+
+  namespaceResourceWhitelist:
+    - group: "*"
+      kind: "*"
+
+  clusterResourceWhitelist: []

@@ -1,206 +1,96 @@
 # GitOps Platform
 
-This repository implements a **GitOps-based deployment model** for Kubernetes using **Argo CD**. It provides a clean, scalable, and environment-driven structure to manage both **applications** and **cluster infrastructure** declaratively.
+Declarative Kubernetes platform using **Argo CD** and **Kustomize**. Helm charts are rendered in CI (or via `make render`) to plain YAML for predictable, reviewable syncs.
 
----
-
-## 📦 Recommended Structure (Clean & Scalable)
+## Structure
 
 ```
 gitops-platform/
-│
+├── bootstrap/           # Root Application (app-of-apps entrypoint)
 ├── apps/
-│   ├── dev/
-│   │   └── my-app.yaml
-│   ├── staging/
-│   │   └── my-app.yaml
+│   ├── dev/             # Argo CD Application manifests (split per component)
+│   ├── uat/
 │   └── prod/
-│       └── my-app.yaml
-│
-├── projects/
-│   └── default-project.yaml
-│
-├── infrastructure/
+├── projects/            # Argo CD AppProjects (infra + apps RBAC)
+├── helm-values/         # Helm values only (source of truth for chart config)
+│   ├── dev/
+│   └── prod/
+├── infrastructure/      # Rendered manifests + Kustomize overlays
 │   ├── namespaces/
-│   │   └── devops-lab.yaml
-│   ├── ingress/
+│   ├── prometheus-operator-crds/
 │   ├── cert-manager/
-│   └── monitoring/
-│
-├── workloads/
-│   └── my-app/
-│       ├── base/
-│       │   ├── deployment.yaml
-│       │   ├── service.yaml
-│       │   └── kustomization.yaml
-│       └── overlays/
-│           ├── dev/
-│           │   └── kustomization.yaml
-│           ├── staging/
-│           └── prod/
-│
-└── bootstrap/
-    └── root-app.yaml
+│   ├── ingress-nginx/
+│   ├── loki/
+│   ├── kube-prometheus-stack/
+│   └── k8s-monitoring/
+├── workloads/           # Application manifests (Kustomize base + overlays)
+└── scripts/
+    └── render-charts.sh # Renders helm-values → infrastructure/*/base/
 ```
 
----
+## Monitoring stack
 
-## 📁 Folder Breakdown
+| Component | Role |
+|-----------|------|
+| **kube-prometheus-stack** | Prometheus, Grafana, Alertmanager, node-exporter |
+| **Loki** | Log storage (single-binary, filesystem) |
+| **k8s-monitoring** | Grafana Alloy collectors → pod logs & cluster events to Loki |
 
-### apps/
-Argo CD Application definitions (one per app per environment).
-It does NOT contain resources itself, but points to them.
-
-### projects/
-Argo CD AppProjects for RBAC and governance.
-  Which repos are allowed
-  Which clusters/namespaces apps can deploy to
-  Security boundaries (RBAC)
-  Optional policies (sync, quotas, etc.)
-
-### infrastructure/
-Cluster-level resources like namespaces, ingress, and monitoring.
-
-### workloads/
-Application manifests using Kustomize (base + overlays).
-Base should contain:
-  Deployment
-  Service
-  ConfigMaps (generic)
-  Labels
-  Probes
-  Default configuration
-Base should contain:
-  replicas (dev=1, prod=5)
-  image tag (dev=latest, prod=stable)
-  resources (dev=low, prod=high)
-  env vars (debug=true in dev)
-  ingress (maybe only in prod)
-
-### bootstrap/
-Root Argo CD app (App of Apps pattern).
-
----
-
-## 🚀 Sample Argo CD Application
-
-```yaml
-apiVersion: argoproj.io/v1alpha1
-kind: Application
-metadata:
-  name: my-app-dev
-spec:
-  destination:
-    namespace: devops-lab
-    server: https://kubernetes.default.svc
-  source:
-    repoURL: https://github.com/tekne-opsadvise/gitops-platform
-    path: workloads/my-app/overlays/dev
-  project: default
-  syncPolicy:
-    automated:
-      prune: true
-      selfHeal: true
-```
-
----
-
-## ✅ Summary
-
-Production-ready GitOps structure using Argo CD and Kustomize.
-
-# modern-devops-platform
-
-## Docker Build & Push
+## Bootstrap
 
 ```bash
-cd app/
-docker build -t ghcr.io/tekne-ops/devops-lab:latest .
+kubectl apply -f bootstrap/argocd-app.yml
 ```
 
+This creates the `platform-dev` Application, which syncs all apps under `apps/dev/`:
+
+| App | Sync wave | Namespace |
+|-----|-----------|-----------|
+| projects | -3 | argocd |
+| namespaces | -1 | — |
+| prometheus-operator-crds | 0 | monitoring |
+| cert-manager | 1 | cert-manager |
+| ingress-nginx | 2 | ingress-nginx |
+| loki | 3 | monitoring |
+| kube-prometheus-stack | 4 | monitoring |
+| k8s-monitoring | 5 | monitoring |
+| devops-lab | 10 | devops-lab |
+
+## Updating infrastructure
+
+1. Edit values in `helm-values/dev/`
+2. Re-render manifests:
+
 ```bash
-echo "YOUR_GITHUB_PAT" | docker login ghcr.io -u dvaliente-tekne --password-stdin
+make render
 ```
 
-```bash
-docker push ghcr.io/tekne-ops/devops-lab:latest
-```
+3. Commit both values and rendered `infrastructure/*/base/manifests.yaml`
+4. Argo CD syncs automatically
+
+## Prerequisites (manual, once per cluster)
 
 ```bash
-kubectl create secret docker-registry regcred \
---docker-server=ghcr.io \
---docker-username=YOURUSER \
---docker-password=YOURPASS \
---docker-email=YOUREMAIL \
---namespace devops-lab
-```
-
-## Helm Setup
-
-```bash
-curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
-helm repo add bitnami https://charts.bitnami.com/bitnami
-helm repo add grafana https://grafana.github.io/helm-charts
-helm repo update
-```
-
-## ArgoCD Setup
-
-```bash
-kubectl create namespace argocd
-kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
-```
-
-**Credentials:** username is `admin`, password:
-
-```bash
-kubectl get secret argocd-initial-admin-secret -n argocd \
-  -o jsonpath="{.data.password}" | base64 -d
-```
-
-```bash
-argocd repo add https://kubernetes.github.io/ingress-nginx --type helm
-argocd repo add https://prometheus-community.github.io/helm-charts --type helm
-argocd repo add https://grafana.github.io/helm-charts --type helm
-```
-
-```bash
-kubectl edit configmap argocd-cm -n argocd
-Add:
-data:
-  kustomize.buildOptions: --enable-helm --load-restrictor LoadRestrictionsNone
-```
-
-```bash
+# Cloudflare token for cert-manager DNS-01
 kubectl create secret generic cloudflare-api-token \
   --from-literal=api-token=YOUR_TOKEN \
   -n cert-manager
+
+# Image pull secret for devops-lab
+kubectl create secret docker-registry regcred \
+  --docker-server=ghcr.io \
+  --docker-username=YOURUSER \
+  --docker-password=YOURPASS \
+  --namespace devops-lab
 ```
 
-## Prometheus & Grafana Setup
+## Production notes
 
-```bash
-helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
-helm repo update
-helm install kube-prometheus prometheus-community/kube-prometheus-stack
-helm install loki grafana/loki-stack
-```
+- Enable PVCs + `storageClassName` in `helm-values/prod/`
+- Replace `grafana.adminPassword: changeme` with External Secrets / Sealed Secrets
+- Use `apps/prod/` with HA replica counts and resource limits
+- Do not use `emptyDir` for Loki/Prometheus in production
 
-```bash
-kubectl patch svc kube-prometheus-grafana -n monitoring \
-  -p '{"spec": {"type": "NodePort"}}'
-```
+## Argo CD kustomize (legacy clusters)
 
-```bash
-kubectl get secret kube-prometheus-grafana -n monitoring \
-  -o jsonpath="{.data.admin-password}" | base64 -d
-```
-
-## Trivy Security Scanning
-
-```bash
-sudo pacman -Sy --needed trivy
-trivy config .
-trivy image ghcr.io/YOUR_USER/devops-lab:latest
-trivy image --severity HIGH,CRITICAL ghcr.io/tekne-ops/devops-lab:latest
-```
+If migrating from Helm-in-Kustomize, ensure `argocd-cm` no longer requires `--enable-helm` for this repo.

@@ -1,0 +1,30 @@
+# Log and event collection via Grafana Alloy (metrics stay on kube-prometheus-stack)
+cluster:
+  name: tekne-dev
+
+collectors:
+  alloy:
+    enabled: true
+    presets:
+      - filesystem-log-reader
+
+destinations:
+  loki:
+    type: loki
+    url: http://loki.monitoring.svc.cluster.local:3100/loki/api/v1/push
+
+podLogsViaLoki:
+  enabled: true
+  destinations:
+    - loki
+
+clusterEvents:
+  enabled: true
+  destinations:
+    - loki
+
+telemetryServices:
+  node-exporter:
+    deploy: false
+  kube-state-metrics:
+    deploy: false

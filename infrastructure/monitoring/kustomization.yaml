@@ -1,5 +1,0 @@
-resources:
-  - grafana-agent/
-  - loki/
-  - grafana/
-  - prometheus/

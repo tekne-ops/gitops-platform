@@ -1,0 +1,2 @@
+# Production values — copy from dev and enable persistence, secrets, and HA.
+# Render with: VALUES=helm-values/prod ./scripts/render-charts.sh (extend script for prod)
