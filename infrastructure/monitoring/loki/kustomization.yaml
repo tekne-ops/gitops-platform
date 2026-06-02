@@ -10,6 +10,11 @@ helmCharts:
     releaseName: loki
     namespace: monitoring
     valuesInline:
+      loki:
+        storage:
+          type: filesystem
+        commonConfig:
+          replication_factor: 1
       singleBinary:
         replicas: 1
         persistence:
