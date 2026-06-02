@@ -12,3 +12,10 @@ helmCharts:
         persistence:
           enabled: true
           size: 10Gi
+      monitoring:
+        selfMonitoring:
+          enabled: false
+          grafanaAgent:
+            installOperator: false
+      test:
+        enabled: false
