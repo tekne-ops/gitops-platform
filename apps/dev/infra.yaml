@@ -13,6 +13,9 @@ spec:
 
   destination:
     server: https://kubernetes.default.svc
+    # Default for charts that omit metadata.namespace (e.g. grafana-agent).
+    # Charts with explicit namespace (ingress-nginx, cert-manager) are unchanged.
+    namespace: monitoring
 
   syncPolicy:
     automated:
