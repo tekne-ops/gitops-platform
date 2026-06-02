@@ -1,3 +1,6 @@
+helmGlobals:
+  chartHome: /tmp/helmcharts
+
 helmCharts:
   - name: loki
     repo: https://grafana.github.io/helm-charts
