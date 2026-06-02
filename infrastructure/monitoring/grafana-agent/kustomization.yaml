@@ -2,10 +2,17 @@ helmGlobals:
   chartHome: /tmp/helmcharts
 
 helmCharts:
-  - name: grafana-agent-operator
+  - name: grafana-agent
     repo: https://grafana.github.io/helm-charts
-    version: ""
-    releaseName: grafana-agent-operator
+    version: 0.40.0
+    releaseName: grafana-agent
     namespace: monitoring
     valuesInline:
-      installCRDs: true
+      agent:
+        mode: "flow"
+
+      logs:
+        enabled: true
+
+      metrics:
+        enabled: true
