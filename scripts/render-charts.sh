@@ -61,6 +61,7 @@ render kube-prometheus-stack prometheus-community/kube-prometheus-stack "${CHART
 mkdir -p "${ROOT}/infrastructure/alloy-crds/base"
 "${HELM}" show crds grafana/k8s-monitoring \
   --version "${CHART_K8S_MONITORING_VERSION}" \
+  | awk 'BEGIN{first=1} /^apiVersion:/ { if (!first) print "---"; first=0 } { print }' \
   > "${ROOT}/infrastructure/alloy-crds/base/manifests.yaml"
 cat > "${ROOT}/infrastructure/alloy-crds/base/kustomization.yaml" <<'EOF'
 apiVersion: kustomize.config.k8s.io/v1beta1
