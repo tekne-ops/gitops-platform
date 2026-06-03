@@ -18,6 +18,7 @@ gitops-platform/
 ├── infrastructure/      # Rendered manifests + Kustomize overlays
 │   ├── namespaces/
 │   ├── prometheus-operator-crds/
+│   ├── alloy-crds/
 │   ├── cert-manager/
 │   ├── ingress-nginx/
 │   ├── loki/
@@ -53,6 +54,7 @@ This creates the `platform-dev` Application, which syncs all apps under `apps/de
 | ingress-nginx | 2 | ingress-nginx |
 | loki | 3 | monitoring |
 | kube-prometheus-stack | 4 | monitoring |
+| alloy-crds | 4 | monitoring |
 | k8s-monitoring | 5 | monitoring |
 | devops-lab | 10 | devops-lab |
 

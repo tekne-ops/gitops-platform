@@ -9,5 +9,6 @@ resources:
   - ingress-nginx.yaml
   - loki.yaml
   - kube-prometheus-stack.yaml
+  - alloy-crds.yaml
   - k8s-monitoring.yaml
   - devops-lab.yaml

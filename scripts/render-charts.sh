@@ -57,6 +57,18 @@ render loki grafana/loki "${CHART_LOKI_VERSION}" monitoring \
 render kube-prometheus-stack prometheus-community/kube-prometheus-stack "${CHART_KPS_VERSION}" monitoring \
   "${VALUES}/kube-prometheus-stack.yaml" "${ROOT}/infrastructure/kube-prometheus-stack/base" --skip-crds
 
+# Alloy CRDs from k8s-monitoring chart (sync before k8s-monitoring)
+mkdir -p "${ROOT}/infrastructure/alloy-crds/base"
+"${HELM}" show crds grafana/k8s-monitoring \
+  --version "${CHART_K8S_MONITORING_VERSION}" \
+  > "${ROOT}/infrastructure/alloy-crds/base/manifests.yaml"
+cat > "${ROOT}/infrastructure/alloy-crds/base/kustomization.yaml" <<'EOF'
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - manifests.yaml
+EOF
+
 render k8s-monitoring grafana/k8s-monitoring "${CHART_K8S_MONITORING_VERSION}" monitoring \
   "${VALUES}/k8s-monitoring.yaml" "${ROOT}/infrastructure/k8s-monitoring/base" --skip-crds
 
