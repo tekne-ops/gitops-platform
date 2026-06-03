@@ -24,6 +24,8 @@ spec:
       kind: "*"
 
   clusterResourceWhitelist:
+    - group: ""
+      kind: Namespace
     - group: apiextensions.k8s.io
       kind: CustomResourceDefinition
     - group: cert-manager.io
