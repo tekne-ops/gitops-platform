@@ -61,11 +61,11 @@ helm repo update
 
 ## Current GitOps — Grafana (GitOps-managed stack)
 
-Grafana is exposed via NodePort **32000** (`helm-values/dev/kube-prometheus-stack.yaml`). Default admin password in values is `changeme` (change for anything beyond lab).
+Grafana is exposed via NodePort **32001** (`helm-values/dev/kube-prometheus-stack.yaml`; not 32000 — reserved by legacy installs). Default admin password in values is `changeme` (change for anything beyond lab).
 
 ```bash
 # If using NodePort on the cluster node IP:
-# http://<node-ip>:32000
+# http://<node-ip>:32001
 
 # Password from Helm-rendered secret (release name kube-prometheus-stack):
 kubectl get secret kube-prometheus-stack-grafana -n monitoring \
@@ -85,6 +85,9 @@ kubectl delete application infrastructure -n argocd --ignore-not-found
 # Remove manual Helm release that conflicts with GitOps (host port 9100, duplicate operators)
 helm list -n monitoring
 helm uninstall kube-prometheus -n monitoring   # example: old manual release name
+
+# Legacy Grafana Service often blocks NodePort 32000 for kube-prometheus-stack-grafana
+kubectl delete svc grafana -n monitoring --ignore-not-found
 
 # Bootstrap new layout
 kubectl apply -f bootstrap/argocd-app.yml
@@ -195,6 +198,31 @@ trivy image --severity HIGH,CRITICAL ghcr.io/tekne-ops/devops-lab:latest
 ---
 
 ## Troubleshooting
+
+### Grafana NodePort already allocated
+
+If `kube-prometheus-stack` fails with `nodePort: Invalid value: 32000/32001: provided port is already allocated`:
+
+1. **GitOps uses 32001** — delete any legacy Service still on that port:
+
+```bash
+kubectl get svc -n monitoring | grep grafana
+kubectl delete svc grafana -n monitoring --ignore-not-found
+kubectl delete svc kube-prometheus-stack-grafana -n monitoring --ignore-not-found   # only if stuck; Argo will recreate
+```
+
+2. **Legacy stack often holds 32000** — safe to delete `monitoring/grafana` if not managed by Argo CD.
+
+3. Refresh sync:
+
+```bash
+kubectl patch application kube-prometheus-stack -n argocd --type merge \
+  -p '{"metadata":{"annotations":{"argocd.argoproj.io/refresh":"hard"}}}'
+```
+
+Optional: remove other leftover manual-stack resources (`prometheus-server`, `grafana-agent`, deployment `grafana`, etc.).
+
+### General
 
 ```bash
 # Argo CD application status

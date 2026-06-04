@@ -3,7 +3,8 @@ grafana:
   adminPassword: changeme
   service:
     type: NodePort
-    nodePort: 32000
+    # 32001 avoids conflict with legacy manual `grafana` Service on 32000
+    nodePort: 32001
 
 prometheus:
   prometheusSpec:
