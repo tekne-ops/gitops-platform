@@ -2,6 +2,8 @@
 
 Declarative Kubernetes platform using **Argo CD** and **Kustomize**. Helm charts are rendered in CI (or via `make render`) to plain YAML for predictable, reviewable syncs.
 
+**Setup commands, Docker/Helm/Argo install, migration, and troubleshooting:** see [docs/runbook.md](docs/runbook.md).
+
 ## Structure
 
 ```
