@@ -39,6 +39,17 @@ gitops-platform/
 | **Loki** | Log storage (single-binary, filesystem) |
 | **k8s-monitoring** | Grafana Alloy collectors → pod logs & cluster events to Loki |
 
+Grafana UI: `http://<node-ip>:32001`
+
+**Username:** `admin`
+
+**Password:**
+
+```bash
+kubectl get secret kube-prometheus-stack-grafana -n monitoring \
+  -o jsonpath="{.data.admin-password}" | base64 -d; echo
+```
+
 ## Bootstrap
 
 ```bash
